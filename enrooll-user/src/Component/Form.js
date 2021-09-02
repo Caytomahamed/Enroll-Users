@@ -3,6 +3,7 @@ import React,{useState} from 'react'
 import '../App.css';
 import image from './img_avatar.png';
 import axios from 'axios'
+import * as yup from 'yup';
 
 const Form = () => {
 
@@ -11,18 +12,22 @@ const Form = () => {
         name:'',
         password:'',
         email:'',
-        term:false
+        terms:false
     }
     
     // create state hond a initial object
     const [enroll,setEnroll] = useState(initial)
+    const [errors,setErrors] = useState(initial)
+
     const [user,setUser] = useState()
-    console.log(enroll);
+ 
     // create handleChange function 
     const handleChange =(event) => {
         const newUser ={...enroll, 
             [event.target.name]: event.target.type === "checkbox" ? event.target.checked 
             : event.target.value}
+
+            handlevalidationOnchange(event)
 
             setEnroll(newUser)
 
@@ -34,6 +39,30 @@ const Form = () => {
             axios.post("https://reqres.in/api/users",enroll)
             .then((res) => {
                 console.log(res);
+
+                setEnroll(initial)
+            })
+        }
+
+
+        // validation on yup 
+        let schema  = yup.object().shape({
+            name: yup.string().required(),
+            password: yup.number().required().positive().integer(),
+            email: yup.string().email().required(),
+            terms: yup.boolean().oneOf([false], "Must Accept Terms of Service")
+        }
+        )
+
+        function handlevalidationOnchange(event){
+            yup 
+            .reach(schema, event.target.name)
+            .validate(event.target.value)
+            .then((valid) => {
+                setErrors({...errors, [event.target.name]: ''})
+            })
+            .catch((err) => {
+                setErrors({...errors, [event.target.name]: err.errors[0]})
             })
         }
     
@@ -60,6 +89,7 @@ const Form = () => {
                     value={enroll.name}
                     onChange={handleChange}
                     />
+                    {errors.name.length > 0 ? <p className='error'>{errors.name}</p> : null}
                </label> 
 
                <label htmlFor='password'>
@@ -71,6 +101,7 @@ const Form = () => {
                     value={enroll.password}
                     onChange={handleChange}
                     />
+                    {errors.password.length > 0 ? <p className='error'>{errors.password}</p> : null}
                </label><br/>
 
                <label htmlFor='Email'>
@@ -82,16 +113,18 @@ const Form = () => {
                     value={enroll.email}
                     onChange={handleChange}
                     />
+                    {errors.email.length > 0 ? <p className='error'>{errors.email}</p> : null}
                </label>
 
                <label htmlFor='checkbox' className="terms">
                    <input 
                     type='checkbox'
-                    name='term'
-                    value={enroll.term}
+                    name='terms'
+                    value={enroll.terms}
                     onChange={handleChange}
                     />
                      Terms of Service 
+                     {errors.terms.length > 0 ? <p className='error'>{errors.terms}</p> : null}
                </label>
 
                <button type='submit'>Submite</button>
