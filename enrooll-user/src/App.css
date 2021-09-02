@@ -70,8 +70,8 @@ label {
 }
 
 input,
-select,
-textarea {
+select
+ {
   width: 100%;
   margin: 5px 0 0;
   display: block;
@@ -146,4 +146,43 @@ button:disabled {
   width: 15px;
   display: inline-block;
   margin-right: 5px;
+}
+
+/* card users  */
+.row {
+  max-width: 114rem;
+  margin: 0 auto; 
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 5rem;
+}
+
+.row::after {
+  content: "";
+  display: table;
+  clear: both; 
+}
+
+.row [class^=col-] {
+    margin-bottom: 3rem; 
+}
+
+.row [class^=col-]:not(:last-child) {
+      margin-right: 2rem; 
+}
+
+.row .col-1-of-4 {
+  width: calc( ( 100% - 3*6rem ) / 4); 
+  height: 20rem;
+  box-shadow: 4px 3px 30px 1px #f1f1f1;
+  
+}
+
+.title{
+  font-size: 2.5rem;
+}
+
+.para{
+  font-size: 1.6rem;
+  
 }

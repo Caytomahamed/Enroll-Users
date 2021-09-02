@@ -1,4 +1,4 @@
-import { object } from 'prop-types';
+import { func, object } from 'prop-types';
 import React,{useState} from 'react'
 import '../App.css';
 import image from './img_avatar.png';
@@ -10,16 +10,20 @@ const Form = () => {
     // initial object 
     const initial ={
         name:'',
+        number:'',
         password:'',
         email:'',
+        date:'',
+        role:'',
         terms:false
     }
     
     // create state hond a initial object
     const [enroll,setEnroll] = useState(initial)
-    const [errors,setErrors] = useState(initial)
+    const [errors,setErrors] = useState(initial)//errors holding
 
-    const [user,setUser] = useState()
+    const [users,setUser] = useState([])//diplayed user
+    console.log(enroll);
  
     // create handleChange function 
     const handleChange =(event) => {
@@ -38,18 +42,22 @@ const Form = () => {
             event.preventDefault()
             axios.post("https://reqres.in/api/users",enroll)
             .then((res) => {
-                console.log(res);
-
+                setUser(res.data)
+           
                 setEnroll(initial)
             })
         }
+
 
 
         // validation on yup 
         let schema  = yup.object().shape({
             name: yup.string().required(),
             password: yup.number().required().positive().integer(),
+            number: yup.number().required().positive().integer(),
+            date: yup.date().default(() => new Date()),
             email: yup.string().email().required(),
+            role: yup.string(),
             terms: yup.boolean().oneOf([false], "Must Accept Terms of Service")
         }
         )
@@ -65,7 +73,8 @@ const Form = () => {
                 setErrors({...errors, [event.target.name]: err.errors[0]})
             })
         }
-    
+
+  
    return(
        <div>
 
@@ -93,7 +102,7 @@ const Form = () => {
                </label> 
 
                <label htmlFor='password'>
-                 password 
+                    Password 
                    <input 
                     type='password'
                     placeholder='Enter your password'
@@ -102,7 +111,19 @@ const Form = () => {
                     onChange={handleChange}
                     />
                     {errors.password.length > 0 ? <p className='error'>{errors.password}</p> : null}
-               </label><br/>
+               </label>
+
+               <label htmlFor='number'>
+                 Telephone
+                   <input 
+                    type='number'
+                    placeholder='Enter your number'
+                    name='number'
+                    value={enroll.number}
+                    onChange={handleChange}
+                    />
+                    {errors.number.length > 0 ? <p className='error'>{errors.number}</p> : null}
+               </label>
 
                <label htmlFor='Email'>
                     Email 
@@ -116,6 +137,28 @@ const Form = () => {
                     {errors.email.length > 0 ? <p className='error'>{errors.email}</p> : null}
                </label>
 
+                <select name='role' value={enroll.role} onChange={handleChange}>
+                 <option >  ---please select educational level -- </option>
+                 <option >Primary</option>
+                 <option >High school</option>
+                 <option  >University</option>
+                </select>
+
+                {errors.role.length > 0 ? <p className='error'>{errors.role}</p> : null}
+
+               <label htmlFor='date'>
+                    Date   
+                   <input 
+                    type='date'
+                    placeholder='Enter your date'
+                    name='date'
+                    value={enroll.date}
+                    onChange={handleChange}
+                    />
+                    {errors.date.length > 0 ? <p className='error'>{errors.date}</p> : null}
+               </label>
+
+
                <label htmlFor='checkbox' className="terms">
                    <input 
                     type='checkbox'
@@ -126,15 +169,32 @@ const Form = () => {
                      Terms of Service 
                      {errors.terms.length > 0 ? <p className='error'>{errors.terms}</p> : null}
                </label>
-
+             
                <button type='submit'>Submite</button>
                
                <h2>Welcome to our site</h2>
             
            </form>
-        
+         
+       <div className='row'>
+          <div  className='col-1-of-4'>
+              <h3 className='title'>Name : {users.name}</h3>
+              <p className='para'>ID : {users.id}</p>
+              <p className='para'>Email : {users.email}</p>
+              <p className='para'>Tel : {users.number}</p>
+              <p className='para'>Level : {users.role}</p>
+            
+          </div>
+      
+              <p className='para'>  <pre>{JSON.stringify(users,null,2)}</pre></p>
+            
+       </div>
+
+    
+       
        </div>
    )
+     
 }
 
 export default Form;
